@@ -105,4 +105,34 @@ public class SanPhamServiceImpl implements SanPhamService {
 		return sanPhamRepository.timKiemSanPham(searchText);
 	}
 
+	@Override
+	public int layTongSoTrang() {
+		return sanPhamRepository.layTongSoTrang();
+	}
+
+	@Override
+	public List<SanPhamDTO> layDanhSachSanPham(int pageNumber) {
+		return sanPhamRepository.layDanhSachSanPham(pageNumber);
+	}
+
+	@Override
+	public int layTongSoTrang(String idThuongHieu) {
+		return sanPhamRepository.layTongSoTrang(idThuongHieu);
+	}
+
+	@Override
+	public List<SanPhamDTO> layDanhSachSanPhamTheoThuongHieu(String idThuongHieu, int pageNumber) {
+		return sanPhamRepository.layDanhSachSanPhamTheoThuongHieu(idThuongHieu, pageNumber);
+	}
+
+	@Override
+	public int layTongSoTrangTimKiem(String searchText) {
+		return sanPhamRepository.layTongSoTrangTimKiem(searchText);
+	}
+
+	@Override
+	public List<SanPhamDTO> timKiemSanPham(String searchText, int pageNumber) {
+		return sanPhamRepository.timKiemSanPham(searchText, pageNumber);
+	}
+
 }

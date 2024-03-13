@@ -31,6 +31,42 @@
 	</c:if>
 
 	<c:import url="/views/header.jsp"></c:import>
+	
+	<c:set var="searchText" value='${not empty sessionScope.searchText ? sessionScope.searchText : "" }'/>
+	<c:set var="functionPrefix" value='${empty searchText ? "show" : "search"}'/>
+	<c:set var="idThuongHieu" value='${not empty param.idThuongHieu ? param.idThuongHieu : "" }'/>
+	
+	<%
+		// cài đặt phân trang
+		int currentPageNumer = (Integer)request.getAttribute("currentPageNumer"); // Do server trả về 
+   		int totalPageNumber = (Integer)request.getAttribute("totalPageNumber"); // Do server trả về
+   		int stt = (currentPageNumer - 1)*15 + 1;
+   		
+   		int[] pageNumberList = new int[10]; // Do client tự tính toán
+   		int pageQuantity = 0; // Do client tự tính toán
+   		
+   		if (totalPageNumber <= 10) {
+        	for (int j = 0; j < totalPageNumber; j++) {
+            	pageNumberList[j] = j+1;
+            	pageQuantity++;
+            }
+      	} else if (totalPageNumber > 10 && currentPageNumer <= 5) {
+            for (int j = 0; j < 10; j++) {
+                pageNumberList[j] = j+1;
+                pageQuantity++;
+            }
+  		} else if (totalPageNumber > 10 && currentPageNumer >= (totalPageNumber - 5)) {
+            for (int j = 0; j < 10; j++) {
+                pageNumberList[j] = totalPageNumber - (9 - j);
+                pageQuantity++;
+            }
+  		} else if (totalPageNumber > 10 && currentPageNumer > 5 && currentPageNumer <= (totalPageNumber - 5)) {
+   			for (int j = 0; j < 10; j++) {
+                pageNumberList[j] = currentPageNumer - 3 + j;
+                pageQuantity++;
+   			}
+   		}
+	%>
 
 	<div class="container-fluid">
 		<div class="panel panel-default panel-table mt-3">
@@ -87,9 +123,6 @@
 						</tr>
 					</thead>
 					<tbody>
-						<%
-						int stt = 0;
-						%>
 						<c:forEach var="sp" items="${listSanPhams}">
 							<tr class="d-flex">
 								<td class="col col-1 d-flex justify-content-center"><a
@@ -101,7 +134,7 @@
 									class="btn btn-danger" data-toggle="tooltip" title="Xóa"> <i
 										class="fa-solid fa-trash-can fa-xs"></i>
 								</a></td>
-								<td class="col col-1 d-flex align-items-center"><%=++stt%></td>
+								<td class="col col-1 d-flex align-items-center"><%=stt++%></td>
 								<td class="col d-flex align-items-center">${sp.id}</td>
 								<td class="col d-flex align-items-center">${sp.tenSanPham}</td>
 								<td class="col d-flex align-items-center">${sp.tenThuongHieu}</td>
@@ -129,6 +162,33 @@
 						</tr>
 					</tfoot>
 				</table>
+			</div>
+			<div class="panel-footer table-bordered">
+				<div class="row align-items-center">
+					<div class="col col-xs-4">
+						<p class="panel-title mt-3 ml-3">Trang <b><%=currentPageNumer%></b> của <%=totalPageNumber%></p>
+					</div>
+					<div class="col col-xs-8">
+						<nav aria-label="Page navigation example"
+							class="d-flex justify-content-end mr-4 mt-3">
+							<ul class="pagination">
+								<% if (currentPageNumer > 1) { %>
+									<li class="page-item"><a class="page-link" href='${functionPrefix}?idThuongHieu=${idThuongHieu}&page=1'>Đầu</a></li>
+	   								<li class="page-item"><a class="page-link" href='${functionPrefix}?idThuongHieu=${idThuongHieu}&page=<%=currentPageNumer - 1%>'>Trước</a></li>
+	   							<% } %>
+	   							
+	   							<% for (int k = 0; k < pageQuantity; k++) { %>
+	   								<li class="page-item"><a class="page-link" href='${functionPrefix}?idThuongHieu=${idThuongHieu}&page=<%=pageNumberList[k]%>'><%= pageNumberList[k] %></a></li>
+	   							<% } %>
+	   
+	   							<% if (currentPageNumer < totalPageNumber) { %>
+		   							<li class="page-item"><a class="page-link" href='${functionPrefix}?idThuongHieu=${idThuongHieu}&page=<%=currentPageNumer + 1%>'>Tiếp</a></li>
+		  							<li class="page-item"><a class="page-link" href='${functionPrefix}?idThuongHieu=${idThuongHieu}&page=<%=totalPageNumber%>'>Cuối</a></li>
+	   							<% } %>
+							</ul>
+						</nav>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -161,6 +221,12 @@
 				$('input[name="searchText"]').attr("disabled", true);
             	$("#btnSearch").attr("disabled", true);
 			}
+			
+			$('.page-item').each(function() {
+				if ($(this).text() == <%=currentPageNumer%>) {
+					$(this).addClass('active');
+				}
+			});
 		});
 	</script>
 	<script type="text/javascript">

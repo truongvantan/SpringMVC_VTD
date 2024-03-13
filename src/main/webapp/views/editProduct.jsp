@@ -34,7 +34,7 @@
 	<c:import url="/views/header.jsp"></c:import>
 
 	<div class="container-fluid">
-		<h2 class="text-center mt-2">Thêm mới sản phẩm</h2>
+		<h2 class="text-center mt-2">Thông tin sản phẩm</h2>
 		<p class="text-center text-danger">${errorMessage}</p>
 		<div class="row d-flex justify-content-center">
 			<form:form action="${contextPath}/product/edit"

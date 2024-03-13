@@ -13,11 +13,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.springmvc.common.ValidateCommon;
 import com.springmvc.dto.SanPhamDTO;
 import com.springmvc.model.SanPham;
 import com.springmvc.model.ThuongHieu;
 import com.springmvc.service.SanPhamService;
 import com.springmvc.service.ThuongHieuService;
+
 
 @Controller
 @RequestMapping("/product")
@@ -37,15 +39,35 @@ public class SanPhamController {
 			return "redirect:/login?error=1";
 		} else {
 			List<ThuongHieu> listThuongHieus = thuongHieuService.layDanhSachThuongHieu();
+
+			int pageNumber = 1; // Mặc định là trang 1
+			int totalPageNumber = 1;
+
+			if (page != null && !"".equals(page)
+					&& com.springmvc.common.ValidateCommon.isValidStringIntegerNumber(page)) {
+				pageNumber = Integer.valueOf(page);
+			}
+
 			List<SanPhamDTO> listSanPhams = null;
 			if ("".equals(idThuongHieu) || idThuongHieu == null) {
-				listSanPhams = sanPhamService.layDanhSachSanPham();
+				totalPageNumber = sanPhamService.layTongSoTrang();
+				if (pageNumber > totalPageNumber) {
+					pageNumber = totalPageNumber;
+				}
+				listSanPhams = sanPhamService.layDanhSachSanPham(pageNumber);
 			} else {
-				listSanPhams = sanPhamService.layDanhSachSanPhamTheoThuongHieu(idThuongHieu);
+				totalPageNumber = sanPhamService.layTongSoTrang(idThuongHieu);
+				if (pageNumber > totalPageNumber) {
+					pageNumber = totalPageNumber;
+				}
+				listSanPhams = sanPhamService.layDanhSachSanPhamTheoThuongHieu(idThuongHieu, pageNumber);
 			}
 
 			model.addAttribute("listThuongHieus", listThuongHieus);
 			model.addAttribute("listSanPhams", listSanPhams);
+			model.addAttribute("currentPageNumer", pageNumber);
+			model.addAttribute("totalPageNumber", totalPageNumber);
+
 			return "productList";
 		}
 	}
@@ -85,8 +107,7 @@ public class SanPhamController {
 			@RequestParam("thuongHieu") String idThuongHieu, @RequestParam("donGiaNhap") String donGiaNhap,
 			@RequestParam("donGiaBan") String donGiaBan, @RequestParam("linkHinhAnh") String linkHinhAnh,
 			@RequestParam("moTa") String moTa) {
-		System.out.println(
-				tenSanPham + "," + idThuongHieu + "," + donGiaNhap + "," + donGiaBan + "," + linkHinhAnh + "," + moTa);
+
 		String errorMessage = sanPhamService.themSanPham(tenSanPham, idThuongHieu, donGiaNhap, donGiaBan, linkHinhAnh,
 				moTa);
 		if (session.getAttribute("sessionNguoiDung") == null) {
@@ -141,9 +162,6 @@ public class SanPhamController {
 			@RequestParam("donGiaNhap") String donGiaNhap, @RequestParam("donGiaBan") String donGiaBan,
 			@RequestParam("linkHinhAnh") String linkHinhAnh, @RequestParam("moTa") String moTa, Model model,
 			HttpSession session, RedirectAttributes redirectAttributes) {
-		System.out.println(maSanPham+","+
-				tenSanPham + "," + idThuongHieu + "," + donGiaNhap + "," + donGiaBan + "," + linkHinhAnh + "," + moTa);
-		
 		String errorMessage = sanPhamService.chinhSuaSanPham(maSanPham, tenSanPham, idThuongHieu, donGiaNhap, donGiaBan,
 				linkHinhAnh, moTa);
 		if (session.getAttribute("sessionNguoiDung") == null) {
@@ -171,21 +189,37 @@ public class SanPhamController {
 			return "forward:/product/showEdit?idProduct=" + maSanPham;
 		}
 	}
-	
-	@PostMapping("/search")
-	public String searchProduct(HttpSession session, Model model, @RequestParam(value = "searchText", required = false) String searchText) {
+
+	@RequestMapping("/search")
+	public String searchProduct(HttpSession session, Model model,
+			@RequestParam(value = "searchText", required = false) String searchText,
+			@RequestParam(value = "page", required = false) String page) {
 		if (session.getAttribute("sessionNguoiDung") == null) {
 			return "redirect:/login?error=1";
 		} else {
 			if (searchText == null) {
-				searchText = (String)session.getAttribute("searchProductText");
+				searchText = (String) session.getAttribute("searchText");
 			}
+			
+			// phân trang
+			int pageNumber = 1; // Mặc định là trang 1
+			if (page != null && !"".equals(page) && ValidateCommon.isValidStringIntegerNumber(page)) {
+				pageNumber = Integer.valueOf(page);
+			}
+			
 			List<ThuongHieu> listThuongHieus = thuongHieuService.layDanhSachThuongHieu();
-			List<SanPhamDTO> listSanPhams = sanPhamService.timKiemSanPham(searchText);
+			int totalPageNumber = sanPhamService.layTongSoTrangTimKiem(searchText);
+			if (pageNumber  > totalPageNumber) {
+				pageNumber = totalPageNumber;
+			}
+			List<SanPhamDTO> listSanPhams = sanPhamService.timKiemSanPham(searchText, pageNumber);
+			
 			model.addAttribute("listThuongHieus", listThuongHieus);
 			model.addAttribute("listSanPhams", listSanPhams);
+			model.addAttribute("currentPageNumer", pageNumber);
+			model.addAttribute("totalPageNumber", totalPageNumber);
 			session.setAttribute("searchText", searchText);
-			
+
 			return "productList";
 		}
 	}

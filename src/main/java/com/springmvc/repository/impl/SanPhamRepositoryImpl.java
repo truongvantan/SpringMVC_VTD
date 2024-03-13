@@ -3,16 +3,14 @@ package com.springmvc.repository.impl;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.taglibs.standard.extra.spath.SPathFilter;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
 
+import com.springmvc.common.Page;
 import com.springmvc.common.ValidateCommon;
 import com.springmvc.dto.SanPhamDTO;
 import com.springmvc.model.SanPham;
@@ -76,7 +74,7 @@ public class SanPhamRepositoryImpl extends JdbcDaoSupport implements SanPhamRepo
 	public List<SanPhamDTO> layDanhSachSanPhamTheoThuongHieu(String idThuongHieu) {
 		List<SanPhamDTO> listSanPhams = new ArrayList<SanPhamDTO>();
 		int thuongHieu = 0;
-		if (ValidateCommon.isValidStringNumber(idThuongHieu)) {
+		if (ValidateCommon.isValidStringIntegerNumber(idThuongHieu)) {
 			thuongHieu = Integer.valueOf(idThuongHieu);
 		}
 
@@ -199,12 +197,166 @@ public class SanPhamRepositoryImpl extends JdbcDaoSupport implements SanPhamRepo
 		String tenSanPham = "%" + searchText + "%";
 		String tenThuongHieu = "%" + searchText + "%";
 		String moTa = "%" + searchText + "%";
-		int id = ValidateCommon.isValidStringNumber(searchText) ? Integer.valueOf(searchText) : -1;
+		int id = ValidateCommon.isValidStringIntegerNumber(searchText) ? Integer.valueOf(searchText) : -1;
 		double donGiaNhap = ValidateCommon.isValidStringNumber(searchText) ? Double.valueOf(searchText) : -1;
 		double donGiaBan = ValidateCommon.isValidStringNumber(searchText) ? Double.valueOf(searchText) : -1;
-		
-		listSanPhams = this.getJdbcTemplate().query(sql, new SanPhamDTOMapper(), tenSanPham, tenThuongHieu, moTa, id, donGiaNhap, donGiaBan);
-		
+
+		listSanPhams = this.getJdbcTemplate().query(sql, new SanPhamDTOMapper(), tenSanPham, tenThuongHieu, moTa, id,
+				donGiaNhap, donGiaBan);
+
+		return listSanPhams;
+	}
+
+	@Override
+	public int layTongSoTrang() {
+		int totalPageNumber = 0;
+		String sql = "SELECT COUNT(Id) AS Total FROM SANPHAM";
+
+		try {
+			totalPageNumber = this.getJdbcTemplate().queryForObject(sql, Integer.class);
+		} catch (DataAccessException e) {
+			e.printStackTrace();
+			return 0;
+		}
+
+		return (int) Math.ceil(totalPageNumber / Page.NUM_OF_ELEMENT.value);
+	}
+
+	@Override
+	public List<SanPhamDTO> layDanhSachSanPham(int pageNumber) {
+		List<SanPhamDTO> listSanPhams = new ArrayList<SanPhamDTO>();
+
+		String sql = """
+				SELECT * FROM
+					(
+						SELECT RowNum = ROW_NUMBER() OVER (ORDER BY SP.Id), SP.Id, TenSanPham, TenThuongHieu, DonGiaNhap, DonGiaBan, LinkHinhAnh, MoTa
+						FROM SANPHAM SP
+						INNER JOIN THUONGHIEU TH ON SP.ThuongHieu = TH.Id
+					) AS tempTable
+				WHERE RowNum > (? * (? - 1)) AND RowNum <= (? * (? - 1)) + ?
+				ORDER BY Id
+				""";
+		try {
+			listSanPhams = this.getJdbcTemplate().query(sql, new SanPhamDTOMapper(),
+					String.valueOf(Page.NUM_OF_ELEMENT.value), String.valueOf(pageNumber),
+					String.valueOf(Page.NUM_OF_ELEMENT.value), String.valueOf(pageNumber),
+					String.valueOf(Page.NUM_OF_ELEMENT.value));
+		} catch (DataAccessException e) {
+			e.printStackTrace();
+		}
+
+		return listSanPhams;
+	}
+
+	@Override
+	public int layTongSoTrang(String idThuongHieu) {
+		int totalPageNumber = 0;
+		int thuongHieu = 0;
+		if (ValidateCommon.isValidStringIntegerNumber(idThuongHieu)) {
+			thuongHieu = Integer.valueOf(idThuongHieu);
+		}
+
+		String sql = "SELECT COUNT(Id) AS Total FROM SANPHAM WHERE THUONGHIEU = ?";
+		try {
+			totalPageNumber = this.getJdbcTemplate().queryForObject(sql, Integer.class, thuongHieu);
+		} catch (DataAccessException e) {
+			e.printStackTrace();
+			return 0;
+		}
+
+		return (int) Math.ceil(totalPageNumber / Page.NUM_OF_ELEMENT.value);
+	}
+
+	@Override
+	public List<SanPhamDTO> layDanhSachSanPhamTheoThuongHieu(String idThuongHieu, int pageNumber) {
+		List<SanPhamDTO> listSanPhams = new ArrayList<SanPhamDTO>();
+		int thuongHieu = 0;
+		if (ValidateCommon.isValidStringIntegerNumber(idThuongHieu)) {
+			thuongHieu = Integer.valueOf(idThuongHieu);
+		}
+
+		String sql = """
+				SELECT * FROM
+					(
+						SELECT RowNum = ROW_NUMBER() OVER (ORDER BY SP.Id), SP.Id, TenSanPham, TenThuongHieu, DonGiaNhap, DonGiaBan, LinkHinhAnh, MoTa
+						FROM SANPHAM SP
+						INNER JOIN THUONGHIEU TH ON SP.ThuongHieu = TH.Id
+						WHERE SP.ThuongHieu = ?
+					) AS tempTable
+				WHERE RowNum > (? * (? - 1)) AND RowNum <= (? * (? - 1)) + ?
+				ORDER BY Id
+				""";
+		try {
+			listSanPhams = this.getJdbcTemplate().query(sql, new SanPhamDTOMapper(), thuongHieu,
+					String.valueOf(Page.NUM_OF_ELEMENT.value), String.valueOf(pageNumber),
+					String.valueOf(Page.NUM_OF_ELEMENT.value), String.valueOf(pageNumber),
+					String.valueOf(Page.NUM_OF_ELEMENT.value));
+		} catch (DataAccessException e) {
+			e.printStackTrace();
+		}
+
+		return listSanPhams;
+	}
+
+	@Override
+	public int layTongSoTrangTimKiem(String searchText) {
+		int totalPageNumber = 0;
+		String sql = """
+				SELECT COUNT(SP.Id) AS TongSoDong
+				FROM SANPHAM SP
+				INNER JOIN THUONGHIEU TH ON SP.ThuongHieu = TH.Id
+				WHERE TenSanPham LIKE ? OR TenThuongHieu LIKE ? OR MoTa LIKE ? OR SP.Id = ? OR DonGiaNhap = ? OR DonGiaBan = ?
+				""";
+
+		String tenSanPham = "%" + searchText + "%";
+		String tenThuongHieu = "%" + searchText + "%";
+		String moTa = "%" + searchText + "%";
+		int id = ValidateCommon.isValidStringIntegerNumber(searchText) ? Integer.valueOf(searchText) : -1;
+		double donGiaNhap = ValidateCommon.isValidStringNumber(searchText) ? Double.valueOf(searchText) : -1;
+		double donGiaBan = ValidateCommon.isValidStringNumber(searchText) ? Double.valueOf(searchText) : -1;
+
+		try {
+			totalPageNumber = this.getJdbcTemplate().queryForObject(sql, Integer.class, tenSanPham, tenThuongHieu, moTa,
+					id, donGiaNhap, donGiaBan);
+		} catch (DataAccessException e) {
+			e.printStackTrace();
+			return 0;
+		}
+
+		return (int) Math.ceil(totalPageNumber / Page.NUM_OF_ELEMENT.value);
+	}
+
+	@Override
+	public List<SanPhamDTO> timKiemSanPham(String searchText, int pageNumber) {
+		List<SanPhamDTO> listSanPhams = new ArrayList<SanPhamDTO>();
+		String sql = """
+				SELECT * FROM
+					(
+						SELECT RowNum = ROW_NUMBER() OVER (ORDER BY SP.Id), SP.Id, TenSanPham, TenThuongHieu, DonGiaNhap, DonGiaBan, LinkHinhAnh, MoTa
+						FROM SANPHAM SP
+						INNER JOIN THUONGHIEU TH ON SP.ThuongHieu = TH.Id
+						WHERE TenSanPham LIKE ? OR TenThuongHieu LIKE ? OR MoTa LIKE ? OR SP.Id = ? OR DonGiaNhap = ? OR DonGiaBan = ?
+					) AS tempTable
+				WHERE RowNum > (? * (? - 1)) AND RowNum <= (? * (? - 1)) + ?
+				ORDER BY Id
+				""";
+
+		String tenSanPham = "%" + searchText + "%";
+		String tenThuongHieu = "%" + searchText + "%";
+		String moTa = "%" + searchText + "%";
+		int id = ValidateCommon.isValidStringIntegerNumber(searchText) ? Integer.valueOf(searchText) : -1;
+		double donGiaNhap = ValidateCommon.isValidStringNumber(searchText) ? Double.valueOf(searchText) : -1;
+		double donGiaBan = ValidateCommon.isValidStringNumber(searchText) ? Double.valueOf(searchText) : -1;
+
+		try {
+			listSanPhams = this.getJdbcTemplate().query(sql, new SanPhamDTOMapper(), tenSanPham, tenThuongHieu, moTa, id,
+					donGiaNhap, donGiaBan, String.valueOf(Page.NUM_OF_ELEMENT.value), String.valueOf(pageNumber),
+					String.valueOf(Page.NUM_OF_ELEMENT.value), String.valueOf(pageNumber),
+					String.valueOf(Page.NUM_OF_ELEMENT.value));
+		} catch (DataAccessException e) {
+			e.printStackTrace();
+		}
+
 		return listSanPhams;
 	}
 

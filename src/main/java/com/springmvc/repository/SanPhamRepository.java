@@ -23,4 +23,16 @@ public interface SanPhamRepository {
 
 	List<SanPhamDTO> timKiemSanPham(String searchText);
 
+	int layTongSoTrang();
+
+	List<SanPhamDTO> layDanhSachSanPham(int pageNumber);
+
+	int layTongSoTrang(String idThuongHieu);
+
+	List<SanPhamDTO> layDanhSachSanPhamTheoThuongHieu(String idThuongHieu, int pageNumber);
+
+	int layTongSoTrangTimKiem(String searchText);
+
+	List<SanPhamDTO> timKiemSanPham(String searchText, int pageNumber);
+
 }
