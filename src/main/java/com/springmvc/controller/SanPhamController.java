@@ -51,13 +51,13 @@ public class SanPhamController {
 			List<SanPhamDTO> listSanPhams = null;
 			if ("".equals(idThuongHieu) || idThuongHieu == null) {
 				totalPageNumber = sanPhamService.layTongSoTrang();
-				if (pageNumber > totalPageNumber) {
+				if (pageNumber > totalPageNumber && totalPageNumber > 0) {
 					pageNumber = totalPageNumber;
 				}
 				listSanPhams = sanPhamService.layDanhSachSanPham(pageNumber);
 			} else {
 				totalPageNumber = sanPhamService.layTongSoTrang(idThuongHieu);
-				if (pageNumber > totalPageNumber) {
+				if (pageNumber > totalPageNumber && totalPageNumber > 0) {
 					pageNumber = totalPageNumber;
 				}
 				listSanPhams = sanPhamService.layDanhSachSanPhamTheoThuongHieu(idThuongHieu, pageNumber);
@@ -209,7 +209,7 @@ public class SanPhamController {
 			
 			List<ThuongHieu> listThuongHieus = thuongHieuService.layDanhSachThuongHieu();
 			int totalPageNumber = sanPhamService.layTongSoTrangTimKiem(searchText);
-			if (pageNumber  > totalPageNumber) {
+			if (pageNumber > totalPageNumber && totalPageNumber > 0) {
 				pageNumber = totalPageNumber;
 			}
 			List<SanPhamDTO> listSanPhams = sanPhamService.timKiemSanPham(searchText, pageNumber);
