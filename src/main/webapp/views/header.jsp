@@ -11,7 +11,7 @@
 		src="<c:url value="/resources/images/logo.png" />" alt="logo"
 		height="50" />
 	</a>
-	<h2 class="text-white font-weight-bold">TÊN CỬA HÀNG</h2>
+	<h2 class="text-white font-weight-bold">DỰ ÁN SPRING MVC - NHÓM 2</h2>
 	<div class="row">
 		<div class="dropdown d-flex align-items-center">
 			<div

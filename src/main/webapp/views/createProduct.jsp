@@ -20,6 +20,11 @@
 	href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
 	integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
 	crossorigin="anonymous" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+	href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;1,100;1,300;1,400;1,500&display=swap"
+	rel="stylesheet">
 <link rel="stylesheet"
 	href='<c:url value="/resources/css/styles.css" />' />
 </head>
@@ -36,7 +41,8 @@
 		<h2 class="text-center mt-2">Thêm mới sản phẩm</h2>
 		<p class="text-center text-danger">${errorMessage}</p>
 		<div class="row d-flex justify-content-center">
-			<form:form action="${contextPath}/product/add" modelAttribute="sanPham" method="POST" class="w-75 mt-2">
+			<form:form action="${contextPath}/product/add"
+				modelAttribute="sanPham" method="POST" class="w-75 mt-2">
 				<!-- <div class="row d-flex justify-content-center">
 					<div class="form-outline mb-4 w-50 text-center">
 						<label
@@ -69,7 +75,7 @@
 						</div>
 						<div class="form-outline mb-4">
 							<label class="form-label text-primary font-weight-bold"
-								for="donGiaNhap">Đơn giá nhập</label> <input type="number"
+								for="donGiaNhap">Đơn giá nhập</label> <input type="text"
 								name="donGiaNhap" id="donGiaNhap" class="form-control"
 								placeholder="Đơn giá nhập" value="${param.donGiaNhap}" />
 						</div>
@@ -77,7 +83,7 @@
 					<div class="col-md-6 col-xs-12">
 						<div class="form-outline mb-4">
 							<label class="form-label text-primary font-weight-bold"
-								for="donGiaBan">Đơn giá bán</label> <input type="number"
+								for="donGiaBan">Đơn giá bán</label> <input type="text"
 								name="donGiaBan" id="donGiaBan" class="form-control"
 								placeholder="Đơn giá bán" value="${param.donGiaBan}" />
 						</div>

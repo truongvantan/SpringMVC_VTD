@@ -20,6 +20,11 @@
 	href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
 	integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
 	crossorigin="anonymous" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+	href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;1,100;1,300;1,400;1,500&display=swap"
+	rel="stylesheet">
 <link rel="stylesheet"
 	href='<c:url value="/resources/css/styles.css" />' />
 </head>
@@ -31,41 +36,44 @@
 	</c:if>
 
 	<c:import url="/views/header.jsp"></c:import>
-	
-	<c:set var="searchText" value='${not empty sessionScope.searchText ? sessionScope.searchText : "" }'/>
-	<c:set var="functionPrefix" value='${empty searchText ? "show" : "search"}'/>
-	<c:set var="idThuongHieu" value='${not empty param.idThuongHieu ? param.idThuongHieu : "" }'/>
-	
+
+	<c:set var="searchText"
+		value='${not empty sessionScope.searchText ? sessionScope.searchText : "" }' />
+	<c:set var="functionPrefix"
+		value='${empty searchText ? "show" : "search"}' />
+	<c:set var="idThuongHieu"
+		value='${not empty param.idThuongHieu ? param.idThuongHieu : "" }' />
+
 	<%
-		// cài đặt phân trang
-		int currentPageNumer = (Integer)request.getAttribute("currentPageNumer"); // Do server trả về 
-   		int totalPageNumber = (Integer)request.getAttribute("totalPageNumber"); // Do server trả về
-   		int stt = (currentPageNumer - 1)*15 + 1;
-   		
-   		int[] pageNumberList = new int[10]; // Do client tự tính toán
-   		int pageQuantity = 0; // Do client tự tính toán
-   		
-   		if (totalPageNumber <= 10) {
-        	for (int j = 0; j < totalPageNumber; j++) {
-            	pageNumberList[j] = j+1;
-            	pageQuantity++;
-            }
-      	} else if (totalPageNumber > 10 && currentPageNumer <= 5) {
-            for (int j = 0; j < 10; j++) {
-                pageNumberList[j] = j+1;
-                pageQuantity++;
-            }
-  		} else if (totalPageNumber > 10 && currentPageNumer >= (totalPageNumber - 5)) {
-            for (int j = 0; j < 10; j++) {
-                pageNumberList[j] = totalPageNumber - (9 - j);
-                pageQuantity++;
-            }
-  		} else if (totalPageNumber > 10 && currentPageNumer > 5 && currentPageNumer <= (totalPageNumber - 5)) {
-   			for (int j = 0; j < 10; j++) {
-                pageNumberList[j] = currentPageNumer - 3 + j;
-                pageQuantity++;
-   			}
-   		}
+	// cài đặt phân trang
+	int currentPageNumer = (Integer) request.getAttribute("currentPageNumer"); // Do server trả về 
+	int totalPageNumber = (Integer) request.getAttribute("totalPageNumber"); // Do server trả về
+	int stt = (currentPageNumer - 1) * 15 + 1;
+
+	int[] pageNumberList = new int[10]; // Do client tự tính toán
+	int pageQuantity = 0; // Do client tự tính toán
+
+	if (totalPageNumber <= 10) {
+		for (int j = 0; j < totalPageNumber; j++) {
+			pageNumberList[j] = j + 1;
+			pageQuantity++;
+		}
+	} else if (totalPageNumber > 10 && currentPageNumer <= 5) {
+		for (int j = 0; j < 10; j++) {
+			pageNumberList[j] = j + 1;
+			pageQuantity++;
+		}
+	} else if (totalPageNumber > 10 && currentPageNumer >= (totalPageNumber - 5)) {
+		for (int j = 0; j < 10; j++) {
+			pageNumberList[j] = totalPageNumber - (9 - j);
+			pageQuantity++;
+		}
+	} else if (totalPageNumber > 10 && currentPageNumer > 5 && currentPageNumer <= (totalPageNumber - 5)) {
+		for (int j = 0; j < 10; j++) {
+			pageNumberList[j] = currentPageNumer - 3 + j;
+			pageQuantity++;
+		}
+	}
 	%>
 
 	<div class="container-fluid">
@@ -74,8 +82,8 @@
 				<form action="${contextPath}/product/search" method="POST"
 					class="row form-inline">
 					<div class="col col-xs-4">
-						<select class="form-control w-75 d-inline-block"
-							name="thuongHieu" id="dsThuongHieu">
+						<select class="form-control w-75 d-inline-block" name="thuongHieu"
+							id="dsThuongHieu">
 							<option value="">Tất cả thương hiệu</option>
 							<c:forEach var="th" items="${listThuongHieus}">
 								<option value="${th.id}">${th.tenThuongHieu}</option>>
@@ -87,9 +95,10 @@
 						<div class="form-inline">
 							<input name="searchText" id="searchText"
 								class="form-control mr-1 w-75" type="search"
-								placeholder="Chọn tất cả thương hiệu để tìm kiếm..." aria-label="Search"
-								value="${sessionScope.searchText}" /> <input class="btn btn-outline-success"
-								type="submit" id="btnSearch" value="Tìm kiếm" />
+								placeholder="Chọn tất cả thương hiệu để tìm kiếm..."
+								aria-label="Search" value="${sessionScope.searchText}" /> <input
+								class="btn btn-outline-success" type="submit" id="btnSearch"
+								value="Tìm kiếm" />
 						</div>
 					</div>
 					<div class="col col-xs-2 text-right">
@@ -166,25 +175,44 @@
 			<div class="panel-footer table-bordered">
 				<div class="row align-items-center">
 					<div class="col col-xs-4">
-						<p class="panel-title mt-3 ml-3">Trang <b><%=currentPageNumer%></b> của <%=totalPageNumber%></p>
+						<p class="panel-title mt-3 ml-3">
+							Trang <b><%=currentPageNumer%></b> của
+							<%=totalPageNumber%></p>
 					</div>
 					<div class="col col-xs-8">
 						<nav aria-label="Page navigation example"
 							class="d-flex justify-content-end mr-4 mt-3">
 							<ul class="pagination">
-								<% if (currentPageNumer > 1) { %>
-									<li class="page-item"><a class="page-link" href='${functionPrefix}?idThuongHieu=${idThuongHieu}&page=1'>Đầu</a></li>
-	   								<li class="page-item"><a class="page-link" href='${functionPrefix}?idThuongHieu=${idThuongHieu}&page=<%=currentPageNumer - 1%>'>Trước</a></li>
-	   							<% } %>
-	   							
-	   							<% for (int k = 0; k < pageQuantity; k++) { %>
-	   								<li class="page-item"><a class="page-link" href='${functionPrefix}?idThuongHieu=${idThuongHieu}&page=<%=pageNumberList[k]%>'><%= pageNumberList[k] %></a></li>
-	   							<% } %>
-	   
-	   							<% if (currentPageNumer < totalPageNumber) { %>
-		   							<li class="page-item"><a class="page-link" href='${functionPrefix}?idThuongHieu=${idThuongHieu}&page=<%=currentPageNumer + 1%>'>Tiếp</a></li>
-		  							<li class="page-item"><a class="page-link" href='${functionPrefix}?idThuongHieu=${idThuongHieu}&page=<%=totalPageNumber%>'>Cuối</a></li>
-	   							<% } %>
+								<%
+								if (currentPageNumer > 1) {
+								%>
+								<li class="page-item"><a class="page-link"
+									href='${functionPrefix}?idThuongHieu=${idThuongHieu}&page=1'>Đầu</a></li>
+								<li class="page-item"><a class="page-link"
+									href='${functionPrefix}?idThuongHieu=${idThuongHieu}&page=<%=currentPageNumer - 1%>'>Trước</a></li>
+								<%
+								}
+								%>
+
+								<%
+								for (int k = 0; k < pageQuantity; k++) {
+								%>
+								<li class="page-item"><a class="page-link"
+									href='${functionPrefix}?idThuongHieu=${idThuongHieu}&page=<%=pageNumberList[k]%>'><%=pageNumberList[k]%></a></li>
+								<%
+								}
+								%>
+
+								<%
+								if (currentPageNumer < totalPageNumber) {
+								%>
+								<li class="page-item"><a class="page-link"
+									href='${functionPrefix}?idThuongHieu=${idThuongHieu}&page=<%=currentPageNumer + 1%>'>Tiếp</a></li>
+								<li class="page-item"><a class="page-link"
+									href='${functionPrefix}?idThuongHieu=${idThuongHieu}&page=<%=totalPageNumber%>'>Cuối</a></li>
+								<%
+								}
+								%>
 							</ul>
 						</nav>
 					</div>
@@ -207,27 +235,38 @@
 		});
 	</script>
 	<script type="text/javascript">
-		$(document).ready(function() {
-			$('#dsThuongHieu').on('change', function() {
-				location.href = '${contextPath}/product/show?idThuongHieu=' + $(this).val() + '&page=1';
-			});
-			
-			$('#dsThuongHieu').val('${param.idThuongHieu}');
-			
-			if ($('#dsThuongHieu').val() == '') {
-				$('input[name="searchText"]').removeAttr("disabled");
-            	$("#btnSearch").removeAttr("disabled");
-			} else {
-				$('input[name="searchText"]').attr("disabled", true);
-            	$("#btnSearch").attr("disabled", true);
-			}
-			
-			$('.page-item').each(function() {
-				if ($(this).text() == <%=currentPageNumer%>) {
-					$(this).addClass('active');
-				}
-			});
-		});
+		$(document)
+				.ready(
+						function() {
+							$('#dsThuongHieu')
+									.on(
+											'change',
+											function() {
+												location.href = '${contextPath}/product/show?idThuongHieu='
+														+ $(this).val()
+														+ '&page=1';
+											});
+
+							$('#dsThuongHieu').val('${param.idThuongHieu}');
+
+							if ($('#dsThuongHieu').val() == '') {
+								$('input[name="searchText"]').removeAttr(
+										"disabled");
+								$("#btnSearch").removeAttr("disabled");
+							} else {
+								$('input[name="searchText"]').attr("disabled",
+										true);
+								$("#btnSearch").attr("disabled", true);
+							}
+
+							$('.page-item').each(function() {
+								if ($(this).text() ==
+	<%=currentPageNumer%>
+		) {
+									$(this).addClass('active');
+								}
+							});
+						});
 	</script>
 	<script type="text/javascript">
 		function confirmDeleteProduct(idProduct) {
